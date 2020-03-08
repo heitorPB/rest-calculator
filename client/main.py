@@ -92,6 +92,7 @@ def start_listening():
 
 
 if __name__ == '__main__':
+    print('Starting client...')
     con, ch = start_listening()
 
     if ch.is_open:

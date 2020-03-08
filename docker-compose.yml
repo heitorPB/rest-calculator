@@ -35,3 +35,17 @@ services:
       - RABBITMQ_QUEUE=calculation
       - RABBITMQ_USER=galileo
       - RABBITMQ_PASS=abc123
+
+  client:
+    build: client/
+    depends_on:
+      - etcd
+      - rabbitmq
+    environment:
+      - ETCD_HOST=etcd
+      - ETCD_PORT=2379
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_QUEUE=calculation
+      - RABBITMQ_USER=galileo
+      - RABBITMQ_PASS=abc123
