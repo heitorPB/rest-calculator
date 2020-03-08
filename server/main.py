@@ -19,7 +19,9 @@ RABBIT_USER = config('RABBITMQ_USER')
 RABBIT_PASS = config('RABBITMQ_PASS')
 
 
-app = FastAPI()
+app = FastAPI(title='Simple REST Calculator',
+              description='Basic math through json',
+              version='0.3.1')
 
 etcd = None
 # RabbitMQ stuff
