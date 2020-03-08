@@ -43,8 +43,12 @@ def process(calculation):
             result = 'expected two or more arguments'
             status = 'error'
         else:
-            result = reduce((lambda x, y: x/y), args)
-            status = 'done'
+            try:
+                result = reduce((lambda x, y: x/y), args)
+                status = 'done'
+            except ZeroDivisionError as e:
+                result = str(e)
+                status = 'error'
     else:
         result = 'invalid function'
         status = 'error'
