@@ -15,6 +15,6 @@ services:
       - etcd
     ports:
       - "80:80"
-#    environment:
-#      - "ETCD_HOST": etcd
-#      - "ETCD_PORT": port
+    environment:
+      - ETCD_HOST=etcd
+      - ETCD_PORT=2379

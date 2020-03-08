@@ -3,14 +3,18 @@ import json
 from typing import List
 from uuid import UUID, uuid4
 
+from decouple import config
 import etcd3
 from fastapi import FastAPI
 from pydantic import BaseModel
 
 
+ETCD_HOST = config('ETCD_HOST', default='localhost')
+ETCD_PORT = config('ETCD_PORT', default='2379')
+
 app = FastAPI()
-etcd = etcd3.client(host='localhost',
-                    port=2379)
+etcd = etcd3.client(host=ETCD_HOST,
+                    port=ETCD_PORT)
 
 
 class Function(str, Enum):
