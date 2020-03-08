@@ -54,9 +54,16 @@ The RabbitMQ needs authentication, to pass the user and password to the
 clients, use env vars:
 
 ```
-$ RABBITMQ_USER=galileo RABBITMQ_PASS=abc123 python server/main.py
+$ virtualenv venv # not needed, but nice to use
+$ pip install -r server/requirements.txt uvicorn
+$ RABBITMQ_USER=galileo RABBITMQ_PASS=abc123 uvicorn server.main:app &
 $ RABBITMQ_USER=galileo RABBITMQ_PASS=abc123 python client/main.py
 ```
+
+Note: the extra `uvicorn` package installed with `pip` only happens outside
+Docker. This is because the Docker image used has a more robust server:
+[Gunicorn](https://gunicorn.org/).
+
 
 ## Using
 
