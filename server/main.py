@@ -6,15 +6,50 @@ from uuid import UUID, uuid4
 from decouple import config
 import etcd3
 from fastapi import FastAPI
+import pika
 from pydantic import BaseModel
 
 
 ETCD_HOST = config('ETCD_HOST', default='localhost')
 ETCD_PORT = config('ETCD_PORT', default='2379')
+RABBIT_HOST = config('RABBITMQ_HOST', default='localhost')
+RABBIT_PORT = config('RABBITMQ_PORT', default='5672')
+RABBIT_QUEUE = config('RABBITMQ_QUEUE', default='calculation')
+RABBIT_USER = config('RABBITMQ_USER')
+RABBIT_PASS = config('RABBITMQ_PASS')
+
 
 app = FastAPI()
-etcd = etcd3.client(host=ETCD_HOST,
-                    port=ETCD_PORT)
+
+etcd = None
+# RabbitMQ stuff
+connection = None
+channel = None
+
+@app.on_event('startup')
+def startup_event():
+    # TODO add some checks here for success
+    global etcd
+    etcd = etcd3.client(host=ETCD_HOST,
+                        port=ETCD_PORT)
+
+    global connection
+    global channel
+    credentials = pika.PlainCredentials(RABBIT_USER, RABBIT_PASS)
+    params = pika.ConnectionParameters(host=RABBIT_HOST,
+                                       port=RABBIT_PORT,
+                                       credentials=credentials)
+    connection = pika.BlockingConnection(params)
+    channel = connection.channel()
+    channel.queue_declare(queue=RABBIT_QUEUE)
+
+
+@app.on_event('shutdown')
+def shutdown_event():
+    if channel.is_open:
+        channel.close()
+    if connection.is_open:
+        connection.close()
 
 
 class Function(str, Enum):
@@ -36,7 +71,14 @@ async def root(calculation: Calculation):
             'status': 'queued',
             'result': ''}
 
-    r = etcd.put(str(uuid), json.dumps(data))
+    body = json.dumps(data)
+    r = etcd.put(str(uuid), body)
+
+    channel.basic_publish(exchange='', # use default one
+                          routing_key=RABBIT_QUEUE,
+                          body=str(uuid),
+                          properties=pika.BasicProperties(delivery_mode=2),
+                         )
 
     return {'id': uuid}
 
