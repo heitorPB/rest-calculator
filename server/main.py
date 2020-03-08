@@ -74,9 +74,13 @@ async def root(calculation: Calculation):
     body = json.dumps(data)
     r = etcd.put(str(uuid), body)
 
+    payload = {'uuid': str(uuid)}
+    payload = json.dumps(payload)
+    if not channel.is_open:
+        startup_event()
     channel.basic_publish(exchange='', # use default one
                           routing_key=RABBIT_QUEUE,
-                          body=str(uuid),
+                          body=payload,
                           properties=pika.BasicProperties(delivery_mode=2),
                          )
 
