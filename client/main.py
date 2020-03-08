@@ -1,6 +1,7 @@
 from functools import reduce
 import json
 import math
+import time
 
 from decouple import config
 import etcd3
@@ -66,6 +67,7 @@ def on_message(channel, method, properties, body):
     result = process(calculation)
     etcd.put(uuid, json.dumps(result))
     print(result)
+    time.sleep(5)
 
     channel.basic_ack(delivery_tag=method.delivery_tag)
 
@@ -95,7 +97,7 @@ if __name__ == '__main__':
     print('Starting client...')
     con, ch = start_listening()
 
-    if ch.is_open:
-        ch.close()
-    if con.is_open:
-        con.close()
+#    if ch.is_open:
+#        ch.close()
+#    if con.is_open:
+#        con.close()
