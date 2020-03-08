@@ -8,6 +8,7 @@ services:
     ports:
       - "2379:2379"
       - "2380:2380"
+    restart: unless-stopped
 
   rabbitmq:
     image: rabbitmq:3.8.2-management-alpine
@@ -19,6 +20,7 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=galileo
       - RABBITMQ_DEFAULT_PASS=abc123
+    restart: unless-stopped
 
   server:
     build: server/
@@ -35,6 +37,7 @@ services:
       - RABBITMQ_QUEUE=calculation
       - RABBITMQ_USER=galileo
       - RABBITMQ_PASS=abc123
+    restart: unless-stopped
 
   client:
     build: client/
@@ -49,3 +52,4 @@ services:
       - RABBITMQ_QUEUE=calculation
       - RABBITMQ_USER=galileo
       - RABBITMQ_PASS=abc123
+    restart: unless-stopped
