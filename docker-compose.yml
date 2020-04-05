@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
 
   rabbitmq:
-    image: rabbitmq:3.8.2-management-alpine
+    image: rabbitmq:3.8.3-management-alpine
     hostname: rabbitmq
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq

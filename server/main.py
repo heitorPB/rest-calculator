@@ -6,6 +6,7 @@ from uuid import UUID, uuid4
 from decouple import config
 import etcd3
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 import pika
 from pydantic import BaseModel
 
@@ -15,13 +16,13 @@ ETCD_PORT = config('ETCD_PORT', default='2379')
 RABBIT_HOST = config('RABBITMQ_HOST', default='localhost')
 RABBIT_PORT = config('RABBITMQ_PORT', default='5672')
 RABBIT_QUEUE = config('RABBITMQ_QUEUE', default='calculation')
-RABBIT_USER = config('RABBITMQ_USER')
-RABBIT_PASS = config('RABBITMQ_PASS')
+RABBIT_USER = config('RABBITMQ_USER', default='galileo')
+RABBIT_PASS = config('RABBITMQ_PASS', default='abc124')
 
 
 app = FastAPI(title='Simple REST Calculator',
               description='Basic math through json',
-              version='0.3.1')
+              version='0.3.2')
 
 etcd = None
 # RabbitMQ stuff
@@ -113,3 +114,21 @@ async def result(request_id: str):
         return {'result': data['result']}
     else:
         return {'result': 'invalid key'}
+
+@app.get("/rapidoc", response_class=HTMLResponse, include_in_schema=False)
+async def rapidoc():
+    return f"""
+        <!doctype html>
+        <html>
+            <head>
+                <meta charset="utf-8">
+                <script 
+                    type="module" 
+                    src="https://unpkg.com/rapidoc/dist/rapidoc-min.js"
+                ></script>
+            </head>
+            <body>
+                <rapi-doc spec-url="{app.openapi_url}"></rapi-doc>
+            </body> 
+        </html>
+    """
